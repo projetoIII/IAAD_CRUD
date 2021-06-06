@@ -18,7 +18,7 @@ class Usuario extends Comparable<Usuario> {
   ///classe para String
   @override
   String toString() {
-    return '${this.email}';
+    return '${this.nome}\n${this.email}';
   }
 
   ///Compara dois pares de palavras.
@@ -74,16 +74,14 @@ class UsuarioController {
     return result;
   }
 
-  ///Retorna uma lista com todos os pares de palavras cadastrados.
-  ///Esta lista não pode ser modificada. Ou seja, não é possível inserir ou
-  ///remover elementos diretamente na lista.
+  ///Retorna uma lista com todos os usuários cadastrados.
   Future<Iterable<Usuario>> getAll() async {
     QuerySnapshot<Map<String, dynamic>> snapshot = await _users.get();
     return snapshot.docs.map((e) => _criarUsuario(e));
   }
 
-  ///Retorna o par de palavras pelo [id], ou [null] caso não exista nenhum par
-  ///com o [id] informado.
+  ///Retorna o usuario pelo id, caso não exista nenhum com o id informado,
+  ///retorna null.
   Future<Usuario> getById(String id) async {
     if (id == null) return null;
 
@@ -91,19 +89,12 @@ class UsuarioController {
     return _criarUsuario(doc);
   }
 
-  ///Retorna uma lista de pares de palavras, onde os elementos da lista respeitam
-  ///a condição representada pela função passada como parâmetro. Caso a função
-  ///passada seja [null], retorna todos os elementos.
-  Future<Iterable<Usuario>> getByFilter() async {
-    Iterable<Usuario> result = await getAll();
-    return List.unmodifiable(result);
-  }
-
   Future delete(Usuario lista) {
     return _users.doc(lista.id).delete();
   }
 }
 
+///Exibe uma mensagem no SnackBar.
 void _showMessage(BuildContext context, String text) {
   final snackBar = SnackBar(
     content: Text(text),
@@ -111,6 +102,7 @@ void _showMessage(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+///Constrói o componente que apresenta o erro no carregamento do Firebase.
 Widget _buildError(context) {
   return Directionality(
     textDirection: TextDirection.ltr,
@@ -149,20 +141,19 @@ Widget _buildLoading(context) {
   );
 }
 
-///Página inicial que apresenta o [BottomNavigationBar], onde cada
-///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
+///Página que apresenta o [AppBar] e a listagem de usuários.
 class ListagemUsuarios extends StatefulWidget {
-  ///Nome da rota referente à página Home.
+  ///Nome da rota referente à página.
   static const routeName = 'usuarios';
 
-  ///Cria o estado da página Home.
+  ///Cria o estado da página [ListagemUsuarios].
   @override
   _ListagemUsuariosState createState() => _ListagemUsuariosState();
 }
 
-///O estado equivalente ao [StatefulWidget] [HomePage].
+///Esta classe é o estado da classe [ListagemUsuarios].
 class _ListagemUsuariosState extends State<ListagemUsuarios> {
-  ///Constroi a tela do [HomePage], incluindo um [BottomNavigationBar]
+  ///Constrói a tela de listagem de usuários.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,21 +165,18 @@ class _ListagemUsuariosState extends State<ListagemUsuarios> {
   }
 }
 
-///Página que apresenta a listagem de palavras.
+///Página que apresenta a listagem de usuários.
 class UsuariosLista extends StatefulWidget {
   ///Construtor da classe
   UsuariosLista();
 
-  ///Método responsável por criar o objeto estado.
+  ///Cria o estado da página [UsuariosLista].
   @override
   _UsuariosListaState createState() => _UsuariosListaState();
 }
 
-///Esta classe é o estado da classe [WordPairListPage].
+///Esta classe é o estado da classe [UsuariosLista].
 class _UsuariosListaState extends State<UsuariosLista> {
-  ///Método getter para retornar os itens. Os itens são ordenados utilizando a
-  ///ordenação definida na classe [DSIWordPair].
-  /// https://dart.dev/guides/language/language-tour#getters-and-setters
   Future<Iterable<Usuario>> get items {
     FutureOr<Iterable<Usuario>> result;
     result = UsuarioController().getAll();
@@ -196,9 +184,7 @@ class _UsuariosListaState extends State<UsuariosLista> {
     return result;
   }
 
-  ///Constroi a listagem de itens.
-  ///Note que é dobrada a quantidade de itens, para que a cada índice par, se
-  ///inclua um separador ([Divider]) na listagem.
+  ///Constrói a lista de usuários incluindo um separador entre cada.
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -228,7 +214,8 @@ class _UsuariosListaState extends State<UsuariosLista> {
     );
   }
 
-  ///Constroi uma linha da listagem a partir do par de palavras e do índice.
+  ///Constrói uma linha da lista de usuários, a partir do par de palavras e do
+  ///índice.
   Widget _buildRow(BuildContext context, int index, Usuario user) {
     return Dismissible(
       key: Key(user.toString()),
