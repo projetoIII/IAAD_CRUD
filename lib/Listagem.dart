@@ -21,7 +21,7 @@ class Usuario extends Comparable<Usuario> {
     return '${this.nome}\n${this.email}';
   }
 
-  ///Compara dois pares de palavras.
+  ///Compara o nome de dois usuários.
   ///Retorna:
   ///-1 se [a] for menor que [b];
   ///0 se [a] for igual [b];
