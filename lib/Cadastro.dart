@@ -16,43 +16,40 @@ class _CadastroState extends State<Cadastro> {
         ),
         body: Center(
             child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  TextFormField(
-                      autofocus: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        labelText: "Nome",
-                        hintText: "Fulano de Tal",
-                      )
-                  ),TextFormField(
-                      autofocus: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        labelText: "E-mail",
-                        hintText: "fulano@email.com",
-                      )
-                  ),
-                  TextFormField(
-                      autofocus: true,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        labelText: "Senha",
-                        hintText: "Insira a senha",
-                      )
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, Rotas.ROTA_USUARIOS);
-                    },
-                    child: const Text("Cadastrar"),
-                  ),
-                ],
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    labelText: "Nome",
+                    hintText: "Fulano de Tal",
+                  )),
+              TextFormField(
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    labelText: "E-mail",
+                    hintText: "fulano@email.com",
+                  )),
+              TextFormField(
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    labelText: "Senha",
+                    hintText: "Insira a senha",
+                  )),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, Rotas.ROTA_LOGIN);
+                },
+                child: const Text("Cadastrar"),
               ),
-            )
-        ));
+            ],
+          ),
+        )));
   }
 }

@@ -4,6 +4,7 @@ import 'package:app_crud/Login.dart';
 import 'package:flutter/material.dart';
 
 import 'AtualizarCadastro.dart';
+import 'Listagem.dart';
 
 class Rotas {
   static const String ROTA_INICIO = "/inicio";
@@ -20,8 +21,8 @@ class Rotas {
         return MaterialPageRoute(builder: (_) => Login());
       case ROTA_CADASTRO:
         return MaterialPageRoute(builder: (_) => Cadastro());
-      //case ROTA_USUARIOS:
-      //return MaterialPageRoute(builder: (_) => ListaUsuarios());
+      case ROTA_USUARIOS:
+        return MaterialPageRoute(builder: (_) => ListagemUsuarios());
       case ROTA_ATUALIZAR:
         return MaterialPageRoute(builder: (_) => AtualizarCadastro());
       default:

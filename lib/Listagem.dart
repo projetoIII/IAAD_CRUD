@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-///Esta classe é uma implementação própria do [WordPair], incluindo outros
-///atributos e métodos necessários para o App.
-class Listagem extends Comparable<Listagem> {
+///Implementação da classe usuário com seus (definição de atributos
+///e métodos necessários para o App.
+class Usuario extends Comparable<Usuario> {
   String id;
   String email;
   String nome;
   String senha;
 
   ///Construtor da classe
-  Listagem();
+  Usuario();
 
-  ///Este método foi sobrescrito para customizar a conversão de um objeto desta
-  ///calsse para String
+  ///Sobrescrição do método para customizar a conversão de um objeto desta
+  ///classe para String
   @override
   String toString() {
     return '${this.email}';
@@ -27,19 +27,20 @@ class Listagem extends Comparable<Listagem> {
   ///0 se [a] for igual [b];
   ///1 se [a] for maior que [b];
   @override
-  int compareTo(Listagem that) {
+  int compareTo(Usuario that) {
     int result = this.nome.toLowerCase().compareTo(that.nome.toLowerCase());
     return result;
   }
 
-  Listagem.fromJson(Map<String, dynamic> json) {
+  ///Converte um objeto JSON para um objeto do tipo [Usuario].
+  Usuario.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
     email = json['email'];
     nome = json['nome'];
     senha = json['senha'];
   }
 
-  ///Converte um objeto JSON para um objeto do tipo [DSIWordPair].
+  ///Converte um objeto JSON para um objeto do tipo [Usuario].
   Map<String, dynamic> toJson() => {
         'email': email,
         'nome': nome,
@@ -47,23 +48,28 @@ class Listagem extends Comparable<Listagem> {
       };
 }
 
-///Controlador do módulo de pares de palavras.
-class ListagemController {
+///Controlador do módulo de usuarios.
+class UsuarioController {
+  ///CollectionReference -> Objeto usado para adicionar documentos, pegar a referência
+  ///de um documento e consultar documentos
   CollectionReference<Map<String, dynamic>> _users;
 
   ///Construtor da classe.
-  ListagemController() {
+  UsuarioController() {
     _initListagem();
   }
 
-  ///Inicializa a lista com os pares de palavras.
+  ///Inicializa a lista com os usuarios.
   void _initListagem() {
+    /// Define um CollectionReference (users) que faz referência à coleção
+    /// firestore.
     _users = FirebaseFirestore.instance.collection('usuarios');
   }
 
-  ///Cria um par de palavras a partir do snapshot do documento.
-  Listagem _criarUsuario(DocumentSnapshot<Map<String, dynamic>> e) {
-    Listagem result = Listagem.fromJson(e.data());
+  ///Cria um usuário a partir do snapshot (visão momentânea do banco de dados)
+  ///do documento.
+  Usuario _criarUsuario(DocumentSnapshot<Map<String, dynamic>> e) {
+    Usuario result = Usuario.fromJson(e.data());
     result.id = e.id;
     return result;
   }
@@ -71,14 +77,14 @@ class ListagemController {
   ///Retorna uma lista com todos os pares de palavras cadastrados.
   ///Esta lista não pode ser modificada. Ou seja, não é possível inserir ou
   ///remover elementos diretamente na lista.
-  Future<Iterable<Listagem>> getAll() async {
+  Future<Iterable<Usuario>> getAll() async {
     QuerySnapshot<Map<String, dynamic>> snapshot = await _users.get();
     return snapshot.docs.map((e) => _criarUsuario(e));
   }
 
   ///Retorna o par de palavras pelo [id], ou [null] caso não exista nenhum par
   ///com o [id] informado.
-  Future<Listagem> getById(String id) async {
+  Future<Usuario> getById(String id) async {
     if (id == null) return null;
 
     DocumentSnapshot doc = await _users.doc(id).get();
@@ -88,12 +94,12 @@ class ListagemController {
   ///Retorna uma lista de pares de palavras, onde os elementos da lista respeitam
   ///a condição representada pela função passada como parâmetro. Caso a função
   ///passada seja [null], retorna todos os elementos.
-  Future<Iterable<Listagem>> getByFilter() async {
-    Iterable<Listagem> result = await getAll();
+  Future<Iterable<Usuario>> getByFilter() async {
+    Iterable<Usuario> result = await getAll();
     return List.unmodifiable(result);
   }
 
-  Future delete(Listagem lista) {
+  Future delete(Usuario lista) {
     return _users.doc(lista.id).delete();
   }
 }
@@ -145,17 +151,17 @@ Widget _buildLoading(context) {
 
 ///Página inicial que apresenta o [BottomNavigationBar], onde cada
 ///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
-class HomePage extends StatefulWidget {
+class ListagemUsuarios extends StatefulWidget {
   ///Nome da rota referente à página Home.
-  static const routeName = '/';
+  static const routeName = 'usuarios';
 
   ///Cria o estado da página Home.
   @override
-  _HomePageState createState() => _HomePageState();
+  _ListagemUsuariosState createState() => _ListagemUsuariosState();
 }
 
 ///O estado equivalente ao [StatefulWidget] [HomePage].
-class _HomePageState extends State<HomePage> {
+class _ListagemUsuariosState extends State<ListagemUsuarios> {
   ///Constroi a tela do [HomePage], incluindo um [BottomNavigationBar]
   @override
   Widget build(BuildContext context) {
@@ -183,9 +189,9 @@ class _UsuariosListaState extends State<UsuariosLista> {
   ///Método getter para retornar os itens. Os itens são ordenados utilizando a
   ///ordenação definida na classe [DSIWordPair].
   /// https://dart.dev/guides/language/language-tour#getters-and-setters
-  Future<Iterable<Listagem>> get items {
-    FutureOr<Iterable<Listagem>> result;
-    result = ListagemController().getAll();
+  Future<Iterable<Usuario>> get items {
+    FutureOr<Iterable<Usuario>> result;
+    result = UsuarioController().getAll();
 
     return result;
   }
@@ -223,7 +229,7 @@ class _UsuariosListaState extends State<UsuariosLista> {
   }
 
   ///Constroi uma linha da listagem a partir do par de palavras e do índice.
-  Widget _buildRow(BuildContext context, int index, Listagem user) {
+  Widget _buildRow(BuildContext context, int index, Usuario user) {
     return Dismissible(
       key: Key(user.toString()),
       background: Container(
@@ -241,7 +247,7 @@ class _UsuariosListaState extends State<UsuariosLista> {
       direction: DismissDirection.startToEnd,
       onDismissed: (direction) {
         setState(() {
-          ListagemController().delete(user).then((value) {
+          UsuarioController().delete(user).then((value) {
             _showMessage(context, 'A operação foi realizada com sucesso.');
             setState(() {});
           }).onError((error, stackTrace) {

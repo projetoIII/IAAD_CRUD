@@ -2,7 +2,7 @@ import 'package:app_crud/Rotas.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'Listagem.dart';
+import 'Login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,7 +84,7 @@ class _DadosAppState extends State<DadosApp> {
   ///Constrói o App e suas configurações.
   Widget _buildApp(context) {
     return MaterialApp(
-        home: HomePage(),
+        home: Login(),
         theme: ThemeData(appBarTheme: AppBarTheme(color: Color(0xFFEF5350))),
         initialRoute: "/",
         onGenerateRoute: Rotas.generateRoute,
