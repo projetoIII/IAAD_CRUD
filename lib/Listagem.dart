@@ -158,7 +158,7 @@ class _ListagemUsuariosState extends State<ListagemUsuarios> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DSI App (BSI UFRPE)'),
+        title: Text('Usuários'),
       ),
       body: UsuariosLista(),
     );
@@ -217,6 +217,18 @@ class _UsuariosListaState extends State<UsuariosLista> {
   ///Constrói uma linha da lista de usuários, a partir do par de palavras e do
   ///índice.
   Widget _buildRow(BuildContext context, int index, Usuario user) {
+
+    TextEditingController _nomeUsuario = TextEditingController();
+    TextEditingController _emailUsuario = TextEditingController();
+    TextEditingController _senhaUsuario = TextEditingController();
+
+    _nomeUsuario.text = user.nome;
+    _emailUsuario.text = user.email;
+    _senhaUsuario.text = user.senha;
+
+    CollectionReference<Map<String, dynamic>> _users;
+    _users = FirebaseFirestore.instance.collection('usuarios');
+
     return Dismissible(
       key: Key(user.toString()),
       background: Container(
@@ -264,7 +276,61 @@ class _UsuariosListaState extends State<UsuariosLista> {
       },
       child: ListTile(
         title: Text('$index. ${(user)}'),
-        //onTap: () => _updateWordPair(context, wordPair),
+        onTap: (){
+          showDialog(
+              context: context,
+              builder: (context){
+                return AlertDialog(
+                  title: Text("Editar usuário"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextField(
+                        controller: _nomeUsuario,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            labelText: "Nome",
+                            hintText: "Novo nome"
+                        ),
+                      ),
+                      TextField(
+                        controller: _emailUsuario,
+                        decoration: InputDecoration(
+                            labelText: "E-mail",
+                            hintText: "Novo e-mail"
+                        ),
+                      ),
+                      TextField(
+                        controller: _senhaUsuario,
+                        decoration: InputDecoration(
+                            labelText: "Senha",
+                            hintText: "Nova senha"
+                        ),
+                      )
+                    ],
+                  ),
+                  actions: <Widget>[
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Cancelar"),
+                    ),
+                    ElevatedButton(
+                      onPressed: (){
+                        _users.doc(user.id.toString()).update({
+                          "nome": _nomeUsuario.text,
+                          "email": _emailUsuario.text,
+                          "senha": _senhaUsuario.text
+                        });
+                        _emailUsuario.text = user.email;
+                        Navigator.pop(context);
+                      },
+                      child: Text("Atualizar"),
+                    )
+                  ],
+                );
+              }
+          );
+        }
       ),
     );
   }
