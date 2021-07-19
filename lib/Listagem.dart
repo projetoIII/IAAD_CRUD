@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-///Implementação da classe usuário com seus (definição de atributos
-///e métodos necessários para o App.
+///Implementação da classe usuário (definição de atributos e métodos).
 class Usuario extends Comparable<Usuario> {
   String id;
   String email;
@@ -32,23 +31,16 @@ class Usuario extends Comparable<Usuario> {
     return result;
   }
 
-  ///Converte um objeto JSON para um objeto do tipo [Usuario].
+  ///Método que converte um objeto JSON para um objeto do tipo [Usuario].
   Usuario.fromJson(Map<String, dynamic> json) {
     if (json == null) return;
     email = json['email'];
     nome = json['nome'];
     senha = json['senha'];
   }
-
-  ///Converte um objeto JSON para um objeto do tipo [Usuario].
-  Map<String, dynamic> toJson() => {
-        'email': email,
-        'nome': nome,
-        'senha': senha,
-      };
 }
 
-///Controlador do módulo de usuarios.
+///Classe controladora dos usuários.
 class UsuarioController {
   ///CollectionReference -> Objeto usado para adicionar documentos, pegar a referência
   ///de um documento e consultar documentos
@@ -61,16 +53,16 @@ class UsuarioController {
 
   ///Inicializa a lista com os usuarios.
   void _initListagem() {
-    /// Define um CollectionReference (users) que faz referência à coleção
-    /// firestore.
+    /// Define que o objeto CollectionReference (users) faz referência à uma
+    /// coleção do Firebase Cloud Firestore
     _users = FirebaseFirestore.instance.collection('usuarios');
   }
 
   ///Cria um usuário a partir do snapshot (visão momentânea do banco de dados)
   ///do documento.
-  Usuario _criarUsuario(DocumentSnapshot<Map<String, dynamic>> e) {
-    Usuario result = Usuario.fromJson(e.data());
-    result.id = e.id;
+  Usuario _criarUsuario(DocumentSnapshot<Map<String, dynamic>> docsnapshot) {
+    Usuario result = Usuario.fromJson(docsnapshot.data());
+    result.id = docsnapshot.id;
     return result;
   }
 
@@ -80,17 +72,9 @@ class UsuarioController {
     return snapshot.docs.map((e) => _criarUsuario(e));
   }
 
-  ///Retorna o usuario pelo id, caso não exista nenhum com o id informado,
-  ///retorna null.
-  Future<Usuario> getById(String id) async {
-    if (id == null) return null;
-
-    DocumentSnapshot doc = await _users.doc(id).get();
-    return _criarUsuario(doc);
-  }
-
-  Future delete(Usuario lista) {
-    return _users.doc(lista.id).delete();
+  ///Deleta um usuário específico da lista.
+  Future delete(Usuario user) {
+    return _users.doc(user.id).delete();
   }
 }
 
@@ -158,7 +142,7 @@ class _ListagemUsuariosState extends State<ListagemUsuarios> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DSI App (BSI UFRPE)'),
+        title: Text('Usuários'),
       ),
       body: UsuariosLista(),
     );
@@ -177,6 +161,8 @@ class UsuariosLista extends StatefulWidget {
 
 ///Esta classe é o estado da classe [UsuariosLista].
 class _UsuariosListaState extends State<UsuariosLista> {
+  ///Um Future é usado para representar um valor potencial, ou erro, que estará
+  ///disponível em algum momento no futuro.
   Future<Iterable<Usuario>> get items {
     FutureOr<Iterable<Usuario>> result;
     result = UsuarioController().getAll();
@@ -187,6 +173,8 @@ class _UsuariosListaState extends State<UsuariosLista> {
   ///Constrói a lista de usuários incluindo um separador entre cada.
   @override
   Widget build(BuildContext context) {
+    ///Widget que se constrói com base no snapshot mais recente da interação
+    ///com um Future.
     return FutureBuilder(
       future: items,
       builder: (context, snapshot) {
@@ -195,17 +183,16 @@ class _UsuariosListaState extends State<UsuariosLista> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          var wordPairs = snapshot.data;
+          var lista = snapshot.data;
           return ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: wordPairs.length * 2,
+              itemCount: lista.length * 2,
               itemBuilder: (BuildContext _context, int i) {
                 if (i.isOdd) {
                   return Divider();
                 }
                 final int index = i ~/ 2;
-                return _buildRow(
-                    context, index + 1, wordPairs.elementAt(index));
+                return _buildRow(context, index + 1, lista.elementAt(index));
               });
         }
 
@@ -217,7 +204,10 @@ class _UsuariosListaState extends State<UsuariosLista> {
   ///Constrói uma linha da lista de usuários, a partir do par de palavras e do
   ///índice.
   Widget _buildRow(BuildContext context, int index, Usuario user) {
+    ///Um widget que permite descartar um dos usuários da lista arrastando
+    ///para o lado direito
     return Dismissible(
+      ///Controla como um widget substitui outro widget na árvore.
       key: Key(user.toString()),
       background: Container(
           color: Colors.red,
